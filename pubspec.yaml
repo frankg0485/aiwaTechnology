@@ -42,7 +42,13 @@ flutter_native_splash:
 
 # The following section is specific to Flutter.
 flutter:
-
+  fonts:
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/OpenSans-Light.ttf
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -55,6 +61,7 @@ flutter:
 
   assets:
     - assets/images/SplashScreenImage.png
+    - assets/images/LogoImage.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
