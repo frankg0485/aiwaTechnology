@@ -1,7 +1,6 @@
 import 'package:aiwa_technology/Settings.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
-import 'package:aiwa_technology/Theme.dart';
 
 class EQControlPage extends StatefulWidget {
   EQControlPage({Key key}) : super(key: key);
@@ -43,12 +42,14 @@ class _EQControlPageState extends State<EQControlPage> {
                   color: THEME.AIWA_COLOR,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text("Aiwa Prodigy Air Max",
-                    style: TextStyle(
-                      fontFamily: THEME.NORMAL_FONT,
-                      fontSize: 18 / 667 * THEME.SCREEN_HEIGHT,
-                      color: Colors.white,
-                    )),
+                child: Text(
+                  "Aiwa Prodigy Air Max",
+                  style: TextStyle(
+                    fontFamily: THEME.NORMAL_FONT,
+                    fontSize: 18 / 667 * THEME.SCREEN_HEIGHT,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
             Flexible(
@@ -57,7 +58,8 @@ class _EQControlPageState extends State<EQControlPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(right: THEME.CONTAINER_PADDING * 2),
+                    padding:
+                        EdgeInsets.only(right: THEME.CONTAINER_PADDING * 2),
                     child: Image.asset(
                       "assets/images/BatteryIcon.png",
                     ),
