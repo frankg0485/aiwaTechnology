@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class THEME {
-  static const CONTAINER_PADDING = 20.0;
+  static const CONTAINER_PADDING = 10.0;
   static const NORMAL_FONT = "OpenSans";
   static const BUTTON_FONT = "Poppins";
   static const AIWA_COLOR = Color(0xffff220b);

@@ -25,6 +25,7 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
     THEME.SCREEN_HEIGHT = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
