@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => FOTAPage()),
+                  MaterialPageRoute(builder: (context) => FOTAPage(versionString: versionString)),
                 );
               },
             ),
