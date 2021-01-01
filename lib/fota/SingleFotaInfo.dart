@@ -6,8 +6,4 @@ class SingleFotaInfo {
   String agentModelName;
   String agentCompanyName;
   String agentReleaseDate;
-
-  toString() {
-    return "agentVersion: " + agentVersion + "\nagentFotaState: " + agentFotaState + "\nagentModelName: " + agentModelName + "\nagentCompanyName: " + agentCompanyName + "\nagentReleaseDate: " + agentReleaseDate;
-  }
 }
