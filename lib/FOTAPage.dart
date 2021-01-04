@@ -25,9 +25,26 @@ class _FOTAPageState extends State<FOTAPage> {
   var deviceName = "Aiwa Prodigy Air Max";
   var allFWVersions = ["1.1.1.1", "1.1.2.4", "1.2.1.3", "1.3.1.2", "1.5.3.3"];
   var selectedVersion = "";
+  var progress = 0.1;
+  final progressInc = 0.01;
+  final millisecondsInc = 50;
 
   _FOTAPageState() {
     selectedVersion = allFWVersions[2];
+  }
+
+  _startTimer() {
+    final interval = Duration(milliseconds: millisecondsInc);
+    Timer.periodic(interval, (timer) {
+      setState(() {
+        print(progress);
+        if (progress >= 1) {
+          timer.cancel();
+        } else {
+          progress += progressInc;
+        }
+      });
+    });
   }
 
   @override
@@ -133,11 +150,15 @@ class _FOTAPageState extends State<FOTAPage> {
                   ),
                 ),
                 onPressed: () {
-                  _ProgressIndicatorDemoState.beginAnimation();
+                  _startTimer();
                 },
               ),
             ),
-            ProgressIndicatorDemo(),
+            CustomPaint(
+              //size: Size(200, 100),
+              painter: ProgressBarPainter(progress),
+            )
+            //ProgressIndicatorDemo(),
           ],
         ),
       ),
@@ -145,14 +166,40 @@ class _FOTAPageState extends State<FOTAPage> {
   }
 }
 
-class ProgressIndicatorDemo extends StatefulWidget {
+class ProgressBarPainter extends CustomPainter {
+  var barProgress;
+  final totalWidth = 0.75 * THEME.SCREEN_WIDTH;
+  final totalHeight = 40 / 667 * THEME.SCREEN_HEIGHT;
+
+  ProgressBarPainter(this.barProgress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint p = Paint();
+    p.color = THEME.AIWA_COLOR;
+    p.style = PaintingStyle.stroke;
+    p.strokeWidth = 6;
+
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(-totalWidth / 2, 0, totalWidth, totalHeight), Radius.circular(20)), p);
+
+    p.style = PaintingStyle.fill;
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(-totalWidth / 2, 0, totalWidth * barProgress, totalHeight), Radius.circular(20)), p);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+
+}
+
+/*class ProgressIndicatorDemo extends StatefulWidget {
   @override
   _ProgressIndicatorDemoState createState() =>
       new _ProgressIndicatorDemoState();
 }
 
-class _ProgressIndicatorDemoState extends State<ProgressIndicatorDemo>
-    with SingleTickerProviderStateMixin {
+class _ProgressIndicatorDemoState extends State<ProgressIndicatorDemo> with SingleTickerProviderStateMixin {
   static AnimationController controller;
   Animation<double> animation;
 
@@ -192,4 +239,4 @@ class _ProgressIndicatorDemoState extends State<ProgressIndicatorDemo>
       ),
     ));
   }
-}
+}*/
