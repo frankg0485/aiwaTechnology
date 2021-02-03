@@ -1,6 +1,7 @@
 import 'package:aiwa_technology/EQControl.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 class ConnectDevicePage extends StatefulWidget {
   ConnectDevicePage({Key key}) : super(key: key);
@@ -19,11 +20,60 @@ class ConnectDevicePage extends StatefulWidget {
 }
 
 class _ConnectDevicePageState extends State<ConnectDevicePage> {
+  final FlutterBlue flutterBlue = FlutterBlue.instance;
+  final List<BluetoothDevice> devicesList = new List<BluetoothDevice>();
+
+  _addDeviceTolist(final BluetoothDevice device) {
+    if (!devicesList.contains(device) && !device.name.isEmpty) {
+      setState(() {
+        devicesList.add(device);
+        print(devicesList[0].name);
+        flutterBlue.stopScan();
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    flutterBlue.connectedDevices
+        .asStream()
+        .listen((List<BluetoothDevice> devices) {
+      for (BluetoothDevice device in devices) {
+        _addDeviceTolist(device);
+      }
+    });
+    flutterBlue.scanResults.listen((List<ScanResult> results) {
+      for (ScanResult result in results) {
+        _addDeviceTolist(result.device);
+      }
+    });
+    flutterBlue.startScan();
+  }
+
+  createDeviceListView() {
+    var deviceListWidgets = List<Widget>();
+
+    for (BluetoothDevice device in devicesList) {
+      deviceListWidgets.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              device.name,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return deviceListWidgets;
+  }
+
   @override
   Widget build(BuildContext context) {
     THEME.SCREEN_WIDTH = MediaQuery.of(context).size.width;
     THEME.SCREEN_HEIGHT = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -39,22 +89,28 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
               ),
             ),
             Flexible(child: Container()),
-            Container(
-              padding: EdgeInsets.all(THEME.CONTAINER_PADDING),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.red[500],
-                  width: 3,
+            Padding(
+              padding: EdgeInsets.only(
+                  left: THEME.SCREEN_WIDTH / 4, right: THEME.SCREEN_WIDTH / 4),
+              child: Container(
+                padding: EdgeInsets.all(THEME.CONTAINER_PADDING),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.red[500],
+                    width: 3,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                child: ConstrainedBox(
+                  constraints: new BoxConstraints(
+                    minHeight: THEME.SCREEN_HEIGHT / 4,
+                  ),
+                  child: devicesList.isEmpty ? Text("Scanning...") : ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  children: createDeviceListView(),
+                ),
               ),
-              child: Text(
-                "No Devices Found",
-                style: TextStyle(
-                  fontFamily: THEME.NORMAL_FONT,
-                  fontSize: 24 / 667 * THEME.SCREEN_HEIGHT,
-                  color: Colors.black,
-                ),
               ),
             ),
             Flexible(child: Container()),
@@ -62,8 +118,7 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
               padding: EdgeInsets.all(THEME.CONTAINER_PADDING * 2),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(color: Colors.black)
-              ),
+                  side: BorderSide(color: Colors.black)),
               color: Colors.black,
               child: Text(
                 "Connect",
