@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:aiwa_technology/EQControl.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:aiwa_technology/Constants.dart';
 
 class ConnectDevicePage extends StatefulWidget {
   ConnectDevicePage({Key key}) : super(key: key);
@@ -21,13 +24,16 @@ class ConnectDevicePage extends StatefulWidget {
 
 class _ConnectDevicePageState extends State<ConnectDevicePage> {
   final FlutterBlue flutterBlue = FlutterBlue.instance;
-  final List<BluetoothDevice> devicesList = new List<BluetoothDevice>();
+  BluetoothDevice device;
+  BluetoothCharacteristic read;
+  BluetoothCharacteristic write;
+
 
   _addDeviceTolist(final BluetoothDevice device) {
-    if (!devicesList.contains(device) && !device.name.isEmpty) {
+    print(device.name);
+    if (device.name.contains("BLE")) {
       setState(() {
-        devicesList.add(device);
-        print(devicesList[0].name);
+        this.device = device;
         flutterBlue.stopScan();
       });
     }
@@ -49,25 +55,6 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
       }
     });
     flutterBlue.startScan();
-  }
-
-  createDeviceListView() {
-    var deviceListWidgets = List<Widget>();
-
-    for (BluetoothDevice device in devicesList) {
-      deviceListWidgets.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              device.name,
-            ),
-          ],
-        ),
-      );
-    }
-
-    return deviceListWidgets;
   }
 
   @override
@@ -105,11 +92,7 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
                   constraints: new BoxConstraints(
                     minHeight: THEME.SCREEN_HEIGHT / 4,
                   ),
-                  child: devicesList.isEmpty ? Text("Scanning...") : ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  children: createDeviceListView(),
-                ),
+                  child: device == null ? Text("Scanning...") : Text(device.name),
               ),
               ),
             ),
@@ -128,7 +111,34 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
                   color: Colors.white,
                 ),
               ),
-              onPressed: () {
+              onPressed: () async {
+                await device.connect();
+                print("connected");
+                List<BluetoothService> services = await device.discoverServices();
+                services.forEach((service) async {
+                  var characteristics = service.characteristics;
+                  for(BluetoothCharacteristic c in characteristics) {
+                    print(c.uuid);
+                    if (c.uuid == Guid(BLE_READ_CHARACTERISTIC_UUID_STR)) {
+                      read = c;
+                    } else if (c.uuid == Guid(BLE_WRITE_CHARACTERISTIC_UUID_STR)) {
+                      write = c;
+                    } else {
+                      print("ERROR: Unrecognized characteristic");
+                    }
+                   // List<int> value = await c.read();
+                   // print(value);
+                  }
+                  // do something with service
+                });
+                print("-----------");
+                var list = Uint8List(7);
+                list.addAll([5, 90, 3, 0, -42, 12, 0]);
+                write.write(list);
+                read.value.listen((event) {
+                  print("HELLLLLO");
+                  print(event);
+                });
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => EQControlPage()),
