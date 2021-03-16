@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
-import 'package:aiwa_technology/EQControl.dart';
+import 'package:aiwa_technology/fota/AiwaLink.dart';
+import 'package:aiwa_technology/fota/FotaManager.dart';
+import 'package:aiwa_technology/ui/EQControl.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-import 'package:aiwa_technology/Constants.dart';
 
 class ConnectDevicePage extends StatefulWidget {
   ConnectDevicePage({Key key}) : super(key: key);
@@ -23,38 +21,16 @@ class ConnectDevicePage extends StatefulWidget {
 }
 
 class _ConnectDevicePageState extends State<ConnectDevicePage> {
-  final FlutterBlue flutterBlue = FlutterBlue.instance;
-  BluetoothDevice device;
-  BluetoothCharacteristic read;
-  BluetoothCharacteristic write;
-
-
-  _addDeviceTolist(final BluetoothDevice device) {
-    print(device.name);
-    if (device.name.contains("BLE")) {
-      setState(() {
-        this.device = device;
-        flutterBlue.stopScan();
-      });
-    }
-  }
+  AiwaLink mAiwaLink;
+  FotaManager mOtaMgr;
 
   @override
   void initState() {
     super.initState();
-    flutterBlue.connectedDevices
-        .asStream()
-        .listen((List<BluetoothDevice> devices) {
-      for (BluetoothDevice device in devices) {
-        _addDeviceTolist(device);
-      }
-    });
-    flutterBlue.scanResults.listen((List<ScanResult> results) {
-      for (ScanResult result in results) {
-        _addDeviceTolist(result.device);
-      }
-    });
-    flutterBlue.startScan();
+    mAiwaLink = new AiwaLink();
+    mOtaMgr = new FotaManager();
+
+    mAiwaLink.connect();
   }
 
   @override
@@ -92,7 +68,7 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
                   constraints: new BoxConstraints(
                     minHeight: THEME.SCREEN_HEIGHT / 4,
                   ),
-                  child: device == null ? Text("Scanning...") : Text(device.name),
+                  child: Text("placeholder"),//device == null ? Text("Scanning...") : Text(device.name),
               ),
               ),
             ),
@@ -111,34 +87,8 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
                   color: Colors.white,
                 ),
               ),
-              onPressed: () async {
-                await device.connect();
-                print("connected");
-                List<BluetoothService> services = await device.discoverServices();
-                services.forEach((service) async {
-                  var characteristics = service.characteristics;
-                  for(BluetoothCharacteristic c in characteristics) {
-                    print(c.uuid);
-                    if (c.uuid == Guid(BLE_READ_CHARACTERISTIC_UUID_STR)) {
-                      read = c;
-                    } else if (c.uuid == Guid(BLE_WRITE_CHARACTERISTIC_UUID_STR)) {
-                      write = c;
-                    } else {
-                      print("ERROR: Unrecognized characteristic");
-                    }
-                   // List<int> value = await c.read();
-                   // print(value);
-                  }
-                  // do something with service
-                });
-                print("-----------");
-                var list = Uint8List(7);
-                list.addAll([5, 90, 3, 0, -42, 12, 0]);
-                write.write(list);
-                read.value.listen((event) {
-                  print("HELLLLLO");
-                  print(event);
-                });
+              onPressed: () {
+                mOtaMgr.querySingleFotaInfo(0);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => EQControlPage()),

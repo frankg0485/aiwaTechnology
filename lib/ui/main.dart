@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:aiwa_technology/SelectDevicePage.dart';
-import 'package:aiwa_technology/Theme.dart';
+import 'package:aiwa_technology/ui/SelectDevicePage.dart';
 
 void main() {
   runApp(MyApp());

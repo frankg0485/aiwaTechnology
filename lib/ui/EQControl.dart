@@ -1,4 +1,4 @@
-import 'package:aiwa_technology/Settings.dart';
+import 'package:aiwa_technology/ui/Settings.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
 

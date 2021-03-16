@@ -1,4 +1,4 @@
-import 'package:aiwa_technology/FOTAPage.dart';
+import 'package:aiwa_technology/ui/FOTAPage.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
 
