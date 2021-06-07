@@ -3,11 +3,13 @@ import 'dart:typed_data';
 import 'package:aiwa_technology/RaceCommand/constant/RaceID.dart';
 import 'package:aiwa_technology/RaceCommand/constant/RaceType.dart';
 import 'package:aiwa_technology/RaceCommand/packet/RacePacket.dart';
+import 'package:aiwa_technology/fota/FotaManager.dart';
 import 'package:aiwa_technology/fota/FotaStage.dart';
 import 'package:aiwa_technology/fota/StatusCode.dart';
 
+// STAGE 0
 class FotaStage_GetBattery extends FotaStage {
-  FotaStage_GetBattery() {
+  FotaStage_GetBattery(FotaManager mgr) : super(mgr) {
     mRaceId = RaceID.RACE_BLUETOOTH_GET_BATTERY;
   }
 

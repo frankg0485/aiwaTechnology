@@ -4,8 +4,8 @@ import 'package:aiwa_technology/ui/EQControl.dart';
 import 'package:flutter/material.dart';
 import 'package:aiwa_technology/Theme.dart';
 
-class ConnectDevicePage extends StatefulWidget {
-  ConnectDevicePage({Key key}) : super(key: key);
+class SelectDevicePage extends StatefulWidget {
+  SelectDevicePage({Key key}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -17,10 +17,10 @@ class ConnectDevicePage extends StatefulWidget {
   // always marked "final".
 
   @override
-  _ConnectDevicePageState createState() => _ConnectDevicePageState();
+  _SelectDevicePageState createState() => _SelectDevicePageState();
 }
 
-class _ConnectDevicePageState extends State<ConnectDevicePage> {
+class _SelectDevicePageState extends State<SelectDevicePage> {
   AiwaLink mAiwaLink;
   FotaManager mOtaMgr;
 
@@ -28,7 +28,7 @@ class _ConnectDevicePageState extends State<ConnectDevicePage> {
   void initState() {
     super.initState();
     mAiwaLink = new AiwaLink();
-    mOtaMgr = new FotaManager();
+    mOtaMgr = new FotaManager(mAiwaLink);
 
     mAiwaLink.connect();
   }

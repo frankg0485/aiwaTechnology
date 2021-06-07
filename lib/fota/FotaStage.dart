@@ -1,7 +1,9 @@
 import 'dart:collection';
 import 'dart:typed_data';
+import 'package:aiwa_technology/RaceCommand/constant/RaceType.dart';
 import 'package:aiwa_technology/fota/AiwaLink.dart';
 import 'package:aiwa_technology/RaceCommand/packet/RacePacket.dart';
+import 'package:aiwa_technology/fota/FotaManager.dart';
 import 'package:aiwa_technology/fota/StatusCode.dart';
 
 class FotaStage {
@@ -9,18 +11,17 @@ class FotaStage {
 
   Queue<RacePacket> mCmdPacketQueue = Queue<RacePacket>();
   AiwaLink mAiwaLink;
+  FotaManager mOtaMgr;
 
   int mRaceId = 0;
-
   bool mIsRespSuccess;
-
   int mStatusCode = 0xFF;
-
   int mCompletedTaskCount = 0;
+  int mRaceRespType = RaceType.RESPONSE;
 
-  FotaStage(/*AirohaRaceOtaMgr mgr*/) {
+  FotaStage(FotaManager mgr) {
     mAiwaLink = AiwaLink();
-    //mOtaMgr = mgr;
+    mOtaMgr = mgr;
     //mAirohaLink = mgr.getAirohaLink();
     /*mCmdPacketQueue = new ConcurrentLinkedQueue<>();
     mCmdPacketMap = new LinkedHashMap<>();
@@ -85,7 +86,6 @@ class FotaStage {
     print("FotaStage: handle response");
     print(raceId);
     print(mRaceId);
-    print("HHHHHHHHHHHHHHHHH");
     if (raceId != mRaceId) return;
 
     int idx = RacePacket.IDX_PAYLOAD_START;

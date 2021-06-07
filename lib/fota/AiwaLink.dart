@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:aiwa_technology/fota/BLEController.dart';
+import 'package:aiwa_technology/transport/OnRacePacketListener.dart';
 import 'package:aiwa_technology/transport/RacePacketByH4Dispatcher.dart';
 
 
@@ -59,5 +60,9 @@ class AiwaLink {
     } else {
       print("AiwaLink: packet is not race by H4");
     }
+  }
+
+  void registerOnRacePacketListener(String subscriber, OnRacePacketListener listener) {
+    mRacePacketByH4Dispatcher.registerRacePacketListener(subscriber, listener);
   }
 }
