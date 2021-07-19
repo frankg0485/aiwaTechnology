@@ -12,9 +12,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    new HttpClient().getUrl(Uri.parse('https://download1519.mediafire.com/14drifktiv8g/oaqz0v896b9cjhb/Aminy-V2.3.0_U-Air_EN_L_AB1536U-V1.6_20200612_Ath_FileSystem.bin'))
+    /*new HttpClient().getUrl(Uri.parse('https://download1519.mediafire.com/14drifktiv8g/oaqz0v896b9cjhb/Aminy-V2.3.0_U-Air_EN_L_AB1536U-V1.6_20200612_Ath_FileSystem.bin'))
         .then((HttpClientRequest request) => request.close())
-        .then((HttpClientResponse response) => response.transform(Utf8Decoder()).listen(print));
+        .then((HttpClientResponse response) => response.transform(Utf8Decoder()).listen(print));*/
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

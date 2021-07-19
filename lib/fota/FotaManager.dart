@@ -1,5 +1,11 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:typed_data';
+import 'package:aiwa_technology/RaceCommand/constant/Recipient.dart';
+import 'package:aiwa_technology/fota/FotaStage_GetFwInfo.dart';
+import 'package:aiwa_technology/fota/FotaStage_GetVersion.dart';
+import 'package:aiwa_technology/fota/SingleFotaInfo.dart';
+import 'package:convert/convert.dart';
 
 import 'package:aiwa_technology/AgentClientEnum.dart';
 import 'package:aiwa_technology/fota/AiwaLink.dart';
@@ -13,13 +19,15 @@ class FotaManager {
   Queue<FotaStage> mStagesQueue = Queue<FotaStage>();
   FotaStage mCurrentStage;
   AiwaLink mAiwaLink;
+  String mAgentVersion;
+  SingleFotaInfo mSingleFotaInfo = new SingleFotaInfo();
   static final String TAG = "FotaManager";
   OnRacePacketListener mOnRacePacketListener = OnRacePacketListener();
 
-
   FotaManager(AiwaLink aiwaLink) {
     mAiwaLink = aiwaLink;
-    mOnRacePacketListener.handleRespOrInd = ((int raceId, Int8List packet, int raceType) {
+    mOnRacePacketListener.handleRespOrInd =
+        ((int raceId, Int8List packet, int raceType) {
       print("FotaManager: handle response or ind");
       if (mCurrentStage == null) {
         return;
@@ -50,7 +58,6 @@ class FotaManager {
 
       return;
     }*/
-
 
       mCurrentStage.handleResp(raceId, packet, raceType);
 
@@ -121,10 +128,10 @@ class FotaManager {
 */
       // other stages
       mCurrentStage = mStagesQueue.isEmpty ? null : mStagesQueue.removeFirst();
-
+      print("hello");
       if (mCurrentStage != null) {
         //notifyAppListnerStatus("Started: " + mCurrentStage.getClass().getSimpleName());
-
+        print("starting a stage");
         mCurrentStage.start();
       } else {
         // complete
@@ -135,33 +142,76 @@ class FotaManager {
       //mAirohaLink.logToFile(TAG, mCurrentStage.getClass().getSimpleName() + ": send next cmd");
       //actionAfterStageNotCompleted(raceType);
       //}
-
-
     });
     mAiwaLink.registerOnRacePacketListener(TAG, mOnRacePacketListener);
     //mAiwaLink.registerOnConnStateListener(TAG, mConnStateListener);
-
   }
 
   AiwaLink getAiwaLink() {
     return mAiwaLink;
   }
 
+  void setAgentFwInfo(Int8List info) {
+    if (info.length > 20) {
+      // new AE format
+      Int8List versionInfo = new Int8List(6);
+      versionInfo = info.sublist(0, 6);
+      Int8List dateInfo = new Int8List(3);
+      dateInfo = info.sublist(6, 9);
+      Int8List companyInfo = new Int8List(20);
+      companyInfo = info.sublist(9, 29);
+      Int8List modelInfo = new Int8List(20);
+      modelInfo = info.sublist(29, 49);
+
+      String hexStr = hex.encode(companyInfo).replaceAll(" ", "");
+      mSingleFotaInfo.agentCompanyName = ascii.decode(hex.decode(hexStr));
+
+      hexStr = hex.encode(modelInfo).replaceAll(" ", "");
+      mSingleFotaInfo.agentModelName = ascii.decode(hex.decode(hexStr));
+
+      mSingleFotaInfo.agentReleaseDate = (dateInfo[0] + 2000).toString() +
+          "/" +
+          dateInfo[1].toString() +
+          "/" +
+          dateInfo[2].toString();
+
+      int buildNumber = (versionInfo[3] & 0xFF) << 8 | versionInfo[2] & 0xFF;
+      int revisionNumber = (versionInfo[5] & 0xFF) << 8 | versionInfo[4] & 0xFF;
+    } else {
+      // only model name
+      String hexStr = hex.encode(info).replaceAll(" ", "");
+      mSingleFotaInfo.agentModelName = ascii.decode(hex.decode(hexStr));
+    }
+
+    print("SINGLE FOTA INFO: ");
+    print(mSingleFotaInfo.agentCompanyName);
+    print(mSingleFotaInfo.agentModelName);
+    print(mSingleFotaInfo.agentReleaseDate);
+  }
+
+  void setAgentVersion(Int8List version) {
+    String hexStr = hex.encode(version).replaceAll(" ", "");
+    mAgentVersion = ascii.decode(hex.decode(hexStr));
+
+    print("AGENT VERSION: " + mAgentVersion);
+  }
+
   void querySingleFotaInfo(int role) {
     print("FotaManager: query single fota info");
     //renewStageQueue();
 
-    if(role == AgentClientEnum.AGENT){
+    if (role == AgentClientEnum.AGENT) {
       // 2018.01.07 [BTA-3177] - update the nv item at the head
       /*mStagesQueue.offer(new FotaStage_ReclaimNvkey(this, (short)1));
       mStagesQueue.offer(new FotaStage_WriteNV(this, NvKeyId.NV_RECONNECT, new byte[]{0x00}));
 
       QueryPartitionInfo[] queryPartitionInfos = createQueryFotaAndFilesystemPartitionInfos();
       mStagesQueue.offer(new FotaStage_00_QueryPartitionInfo(this, queryPartitionInfos));
-
-      byte[] recipients = new byte[]{Recipient.DontCare};
-      mStagesQueue.offer(new FotaStage_00_GetVersion(this, recipients));
-      mStagesQueue.offer(new FotaStage_00_GetFwInfo(this, recipients));
+*/
+      Int8List recipients = new Int8List.fromList([Recipient.DontCare]);
+      mStagesQueue.add(FotaStage_GetVersion(this, recipients));
+      mStagesQueue.add(FotaStage_GetFwInfo(this, recipients));
+      /*
       mStagesQueue.offer(new FotaStage_00_QueryState(this, recipients));
 
       // 2018.01.07 [BTA-3177] - query the battery at the tail*/

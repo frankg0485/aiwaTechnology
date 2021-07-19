@@ -1,6 +1,8 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+
 class RacePacket {
   static final int IDX_PAYLOAD_START = 6;
   static final int START_CHANNEL_BYTE = 0x05;
@@ -32,9 +34,7 @@ class RacePacket {
     setPayload(payload);
   }
 
-  RacePacket(final int type, int id) {
-    RacePacket.fromID(type, id, null);
-  }
+  RacePacket(final int type, int id) : this.fromID(type, id, null);
 
   void setPayload(Int8List payload) {
     mbArrPayload = payload;
@@ -67,7 +67,8 @@ class RacePacket {
     }
 
     Int8List arrb = Int8List(list.length);
-
+    print(arrb);
+    print(list);
     for (int i = 0; i < arrb.length; i++) {
       arrb[i] = list[i];
     }
