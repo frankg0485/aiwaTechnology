@@ -24,6 +24,8 @@ class FotaManager {
   static final String TAG = "FotaManager";
   OnRacePacketListener mOnRacePacketListener = OnRacePacketListener();
 
+  bool mIsNeedToUpdateFileSystem;
+
   FotaManager(AiwaLink aiwaLink) {
     mAiwaLink = aiwaLink;
     mOnRacePacketListener.handleRespOrInd =
@@ -187,6 +189,10 @@ class FotaManager {
     print(mSingleFotaInfo.agentCompanyName);
     print(mSingleFotaInfo.agentModelName);
     print(mSingleFotaInfo.agentReleaseDate);
+  }
+
+  void setNeedToUpdateFileSystem(bool isNeedToUpdateFilesystem) {
+    mIsNeedToUpdateFileSystem = isNeedToUpdateFilesystem;
   }
 
   void setAgentVersion(Int8List version) {

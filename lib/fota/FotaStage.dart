@@ -4,6 +4,7 @@ import 'package:aiwa_technology/RaceCommand/constant/RaceType.dart';
 import 'package:aiwa_technology/fota/AiwaLink.dart';
 import 'package:aiwa_technology/RaceCommand/packet/RacePacket.dart';
 import 'package:aiwa_technology/fota/FotaManager.dart';
+import 'package:aiwa_technology/fota/RespQueryPartitionInfo.dart';
 import 'package:aiwa_technology/fota/StatusCode.dart';
 
 class FotaStage {
@@ -18,6 +19,8 @@ class FotaStage {
   int mStatusCode = 0xFF;
   int mCompletedTaskCount = 0;
   int mRaceRespType = RaceType.RESPONSE;
+
+  static List<RespQueryPartitionInfo> gRespQueryPartitionInfos = null;
 
   FotaStage(FotaManager mgr) {
     mAiwaLink = AiwaLink();
