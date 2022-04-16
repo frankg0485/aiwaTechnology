@@ -35,6 +35,8 @@ class FotaManager {
   bool mIsNeedToUpdateFileSystem;
   int mAgentFotaState = StageEnum.APP_UNKNOWN;
 
+  bool mIsNeedToUpdateFileSystem;
+
   FotaManager(AiwaLink aiwaLink) {
     mAiwaLink = aiwaLink;
     mOnRacePacketListener.handleRespOrInd =
