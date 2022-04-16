@@ -86,9 +86,6 @@ class FotaStage {
       final int raceId, final Int8List packet, int status, int raceType) {}
 
   void handleResp(final int raceId, final Int8List packet, int raceType) {
-    print("FotaStage: handle response");
-    print(raceId);
-    print(mRaceId);
     if (raceId != mRaceId) return;
 
     int idx = RacePacket.IDX_PAYLOAD_START;
@@ -116,6 +113,8 @@ class FotaStage {
   parsePayloadAndCheckCompeted(extractedRaceId, stripRelayHeaderPacket, mStatusCode, extractedRaceType);
   }else {*/
     mStatusCode = packet[idx];
+    print("ABOUT TO PARSE PAYLOAD...");
+    print("status code: " + mStatusCode.toString());
     parsePayloadAndCheckCompeted(raceId, packet, mStatusCode, raceType);
     //}
 

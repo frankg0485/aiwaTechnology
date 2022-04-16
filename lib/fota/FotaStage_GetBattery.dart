@@ -29,7 +29,7 @@ class FotaStage_GetBattery extends FotaStage {
 
   void parsePayloadAndCheckCompeted(int raceId, Int8List packet, int status, int raceType) {
   //mAirohaLink.logToFile(TAG, "resp status: " + status);
-
+  print("FotaStage_GetBattery resp status: " + status.toString());
   //RacePacket cmd = mCmdPacketMap.get(TAG);
   if (status == StatusCode.FOTA_ERRCODE_SUCESS) {
   //cmd.setIsRespStatusSuccess();

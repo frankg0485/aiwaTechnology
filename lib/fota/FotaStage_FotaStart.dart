@@ -24,10 +24,10 @@ class FotaStage_FotaStart extends FotaStage {
     //{
     //    Recipient (1 byte)
     //} [%RecipientCount%]"
-    Int8List outputStream = Int8List(0);
-    outputStream.add(mRecipients.length);
+    Int8List outputStream = new Int8List.fromList([mRecipients.length] + mRecipients);
+    //outputStream.add(mRecipients.length);
     //try {
-      outputStream += mRecipients;
+      //outputStream += mRecipients;
     //} catch (IOException e) {
     //e.printStackTrace();
     //}
@@ -48,7 +48,7 @@ class FotaStage_FotaStart extends FotaStage {
   @override
   void parsePayloadAndCheckCompeted(int raceId, Int8List packet, int status, int raceType) {
   //mAirohaLink.logToFile(TAG, "resp status: " + status);
-
+  print("FotaStage_FotaStart resp status: " + status.toString());
   //RacePacket cmd = mCmdPacketMap.get(TAG);
   if (status == StatusCode.FOTA_ERRCODE_SUCESS) {
   //cmd.setIsRespStatusSuccess();

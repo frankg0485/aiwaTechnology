@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:aiwa_technology/Helper.dart';
+import 'package:aiwa_technology/util/Converter.dart';
 import 'package:aiwa_technology/fota/FotaManager.dart';
 import 'package:aiwa_technology/transport/OnRacePacketListener.dart';
 
@@ -21,11 +21,11 @@ class RacePacketByH4Dispatcher {
   }
 
   void parseSend(Int8List packet) {
-  int raceId = Helper.bytesToInt(packet[5], packet[4]);
+  int raceId = Converter.bytesToInt(packet[5], packet[4]);
 
   int raceType = packet[1];
 
-  int payloadLength = Helper.bytesToInt(packet[3], packet[2]) - 2;
+  int payloadLength = Converter.bytesToInt(packet[3], packet[2]) - 2;
 
   int payloadStartIdx = 6;
 

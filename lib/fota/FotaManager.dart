@@ -2,9 +2,14 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:aiwa_technology/RaceCommand/constant/Recipient.dart';
+import 'package:aiwa_technology/fota/FotaStage_FotaStart.dart';
 import 'package:aiwa_technology/fota/FotaStage_GetFwInfo.dart';
 import 'package:aiwa_technology/fota/FotaStage_GetVersion.dart';
+import 'package:aiwa_technology/fota/FotaStage_QueryState.dart';
+import 'package:aiwa_technology/fota/OnAiwaFotaStatusClientAppListener.dart';
 import 'package:aiwa_technology/fota/SingleFotaInfo.dart';
+import 'package:aiwa_technology/fotaState/StageEnum.dart';
+import 'package:aiwa_technology/util/Converter.dart';
 import 'package:convert/convert.dart';
 
 import 'package:aiwa_technology/AgentClientEnum.dart';
@@ -17,14 +22,18 @@ import 'package:flutter/cupertino.dart';
 
 class FotaManager {
   Queue<FotaStage> mStagesQueue = Queue<FotaStage>();
+  SingleFotaInfo mSingleFotaInfo = new SingleFotaInfo();
+  OnRacePacketListener mOnRacePacketListener = OnRacePacketListener();
+  Map<String, OnAiwaFotaStatusClientAppListener> mAppLayerListeners =
+      new Map<String, OnAiwaFotaStatusClientAppListener>();
   FotaStage mCurrentStage;
   AiwaLink mAiwaLink;
   String mAgentVersion;
-  SingleFotaInfo mSingleFotaInfo = new SingleFotaInfo();
-  static final String TAG = "FotaManager";
-  OnRacePacketListener mOnRacePacketListener = OnRacePacketListener();
 
+  static final String TAG = "FotaManager";
+  String mStrAgentStateEnum;
   bool mIsNeedToUpdateFileSystem;
+  int mAgentFotaState = StageEnum.APP_UNKNOWN;
 
   FotaManager(AiwaLink aiwaLink) {
     mAiwaLink = aiwaLink;
@@ -130,10 +139,9 @@ class FotaManager {
 */
       // other stages
       mCurrentStage = mStagesQueue.isEmpty ? null : mStagesQueue.removeFirst();
-      print("hello");
       if (mCurrentStage != null) {
         //notifyAppListnerStatus("Started: " + mCurrentStage.getClass().getSimpleName());
-        print("starting a stage");
+        print("starting a stage: " + mCurrentStage.toString());
         mCurrentStage.start();
       } else {
         // complete
@@ -222,6 +230,9 @@ class FotaManager {
 
       // 2018.01.07 [BTA-3177] - query the battery at the tail*/
       mStagesQueue.add(FotaStage_GetBattery(this));
+
+      mStagesQueue.add(FotaStage_FotaStart(this, recipients));
+      mStagesQueue.add(FotaStage_QueryState(this, recipients));
     }
 
     /*if(role == AgentClientEnum.CLIENT){
@@ -252,5 +263,34 @@ class FotaManager {
 
     mCurrentStage = mStagesQueue.removeFirst();
     mCurrentStage.start();
+  }
+
+  void setAgentFotaState(Int8List queryState) {
+    mStrAgentStateEnum = Converter.byte2HexStrReverse(queryState);
+
+    // mAirohaLink.logToFile(TAG, "RACE_FOTA_QUERY_STATE resp state: " + mStrAgentStateEnum);
+
+//        notifyStageEnum(mStrAgentStateEnum);
+    print(TAG + "\tRACE_FOTA_QUERY_STATE resp state: " + mStrAgentStateEnum);
+
+    mAgentFotaState = (queryState[0] & 0xFF) | ((queryState[1] & 0xFF) << 8);
+
+    handleQueriedStates(mAgentFotaState);
+
+    _notifySingleFotaInfo(mStrAgentStateEnum, mAgentVersion);
+  }
+
+  void handleQueriedStates(int queryState) {}
+
+  void _notifySingleFotaInfo(String strFotaState, String strVersion) {
+    mSingleFotaInfo.agentFotaState = strFotaState;
+    mSingleFotaInfo.agentVersion = strVersion;
+
+    for (OnAiwaFotaStatusClientAppListener listener
+        in mAppLayerListeners.values) {
+      if (listener != null) {
+        listener.onSingleFotaInfoUpdated(mSingleFotaInfo);
+      }
+    }
   }
 }
